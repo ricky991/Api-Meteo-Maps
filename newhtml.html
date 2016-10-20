@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+        * {
+            border-size: border-box;
+            padding:0;
+            margin:0;
+        }
+       #map {
+        height: 100vh;
+        width: 100vw;
+       }
+       .content {
+           width: 200px;
+           height: 200px;
+           background-color: white;
+       }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script   src="https://code.jquery.com/jquery-3.1.1.min.js"   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="   crossorigin="anonymous"></script>
+    <script>
+            
+        
+        // This example displays a map with the language and region set
+      // to Japan. These settings are specified in the HTML script element
+      // when loading the Google Maps JavaScript API.
+      // Setting the language shows the map in the language of your choice.
+      // Setting the region biases the geocoding results to that region.
+      var marker=[];
+      var infowindow=[];
+      var contentString;
+      function initMap() {
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 6,
+          center: {lat: 42.388180, lng: 12.694977},
+          styles: [
+            {elementType: 'geometry', stylers: [{color: '#242f3e'}]},
+            {elementType: 'labels.text.stroke', stylers: [{color: '#242f3e'}]},
+            {elementType: 'labels.text.fill', stylers: [{color: '#746855'}]},
+            {
+              featureType: 'administrative.locality',
+              elementType: 'labels.text.fill',
+              stylers: [{color: '#d59563'}]
+            },
+            {
+              featureType: 'poi',
+              elementType: 'labels.text.fill',
+              stylers: [{color: '#d59563'}]
+            },
+            {
+              featureType: 'poi.park',
+              elementType: 'geometry',
+              stylers: [{color: '#263c3f'}]
+            },
+            {
+              featureType: 'poi.park',
+              elementType: 'labels.text.fill',
+              stylers: [{color: '#6b9a76'}]
+            },
+            {
+              featureType: 'road',
+              elementType: 'geometry',
+              stylers: [{color: '#38414e'}]
+            },
+            {
+              featureType: 'road',
+              elementType: 'geometry.stroke',
+              stylers: [{color: '#212a37'}]
+            },
+            {
+              featureType: 'road',
+              elementType: 'labels.text.fill',
+              stylers: [{color: '#9ca5b3'}]
+            },
+            {
+              featureType: 'road.highway',
+              elementType: 'geometry',
+              stylers: [{color: '#746855'}]
+            },
+            {
+              featureType: 'road.highway',
+              elementType: 'geometry.stroke',
+              stylers: [{color: '#1f2835'}]
+            },
+            {
+              featureType: 'road.highway',
+              elementType: 'labels.text.fill',
+              stylers: [{color: '#f3d19c'}]
+            },
+            {
+              featureType: 'transit',
+              elementType: 'geometry',
+              stylers: [{color: '#2f3948'}]
+            },
+            {
+              featureType: 'transit.station',
+              elementType: 'labels.text.fill',
+              stylers: [{color: '#d59563'}]
+            },
+            {
+              featureType: 'water',
+              elementType: 'geometry',
+              stylers: [{color: '#17263c'}]
+            },
+            {
+              featureType: 'water',
+              elementType: 'labels.text.fill',
+              stylers: [{color: '#515c6d'}]
+            },
+            {
+              featureType: 'water',
+              elementType: 'labels.text.stroke',
+              stylers: [{color: '#17263c'}]
+            }
+          ]
+        });
+        
+        
+        var cities= ['3173435','6541999','6541470','6541858','3172394','6541998','3165186','3169071','3176219','3183089','6542000','3165525','1276948','6540125','2523920','3176959','3165243','3171180','3182997','3164603'];
+        $.each(cities, function(i) { 
+            $.get("http://api.openweathermap.org/data/2.5/weather?id="+cities[i]+"&units=metric&APPID=ea89f272bb81b851368ba4f8d9f03c06", 
+            function(data) {
+
+                var longit= data.coord.lon;
+                var latit= data.coord.lat;
+                var ico= data.weather[0].icon;
+                console.log(i);
+
+                contentString = '<div class="content">'+
+                '<h1 class="firstHeading">'+data.name+'</h1>'+
+                '<p><b>Temperatura:</b> '+data.main.temp+'°C</p>'+
+                '<p><b>Umidita:</b> '+data.main.humidity+'%</p>'+
+                '<p><b>Velocita vento:</b> '+data.wind.speed+' km/h</p>'+
+                '</div>';
+
+                infowindow[i] = new google.maps.InfoWindow({
+                    content: contentString
+                });
+
+                var image = 'http://openweathermap.org/img/w/'+ico+'.png';
+
+                marker[i] = new google.maps.Marker({
+                  position: {lat: latit, lng: longit},
+                  map: map,
+                  icon: image
+                });
+            });
+        });
+        
+        for (var i=0;i<marker.length;i++) {
+            /*marker[i].click(function() {
+                infowindow[i].open(map, marker[i]);
+                console.log("cliccato");
+            });*/
+            
+            marker[i].addListener('click', function() {
+              infowindow[i].open(map, marker[i]);
+              console.log("cliccato");
+            });
+      
+    }
+      }
+
+    
+       /*$.get("http://api.openweathermap.org/data/2.5/group?id=3173435,6541999,6541470,6541858,3172394,6541998,3165186,3169071,3176219,3183089,6542000,3165525,1276948,6540125,2523920,3176959,3165243,3171180,3182997,3164603&units=metric&APPID=ea89f272bb81b851368ba4f8d9f03c06", 
+        function(data) {
+             $.each(data, function(i) {
+              var longit= data.list[0].coord.lon;
+              var latit= data.list[0].coord.lat;
+              var ico= data.list[0].weather[0].icon;
+              console.log(longit);
+          
+        
+        
+        var image = 'http://openweathermap.org/img/w/'+ico+'.png';
+    
+        var beachMarker = new google.maps.Marker({
+          position: {lat: latit, lng: longit},
+          map: map,
+          icon: image
+      });
+        });
+        });*/
+        
+        
+        
+        
+      
+        /*var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 6,
+          center: uluru
+          
+        });
+      function initMap() {
+        var uluru = {lat: 42.388180, lng: 12.694977};
+        
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 6,
+          center: uluru
+          
+        });
+        
+        var marker = new google.maps.Marker({
+          position: uluru,
+          map: map
+        });
+        
+        
+      }
+      
+      
+       function setMarkers(map,latit,longit,ico) {
+        // Adds markers to the map.
+
+        // Marker sizes are expressed as a Size of X,Y where the origin of the image
+        // (0,0) is located in the top left of the image.
+
+        // Origins, anchor positions and coordinates of the marker increase in the X
+        // direction to the right and in the Y direction down.
+        var image = {
+          url: 'http://openweathermap.org/img/w/'+ico+'.png',
+          // This marker is 20 pixels wide by 32 pixels high.
+          size: new google.maps.Size(40, 40),
+          // The origin for this image is (0, 0).
+          origin: new google.maps.Point(0, 0),
+          // The anchor for this image is the base of the flagpole at (0, 32).
+          anchor: new google.maps.Point(0, 32)
+        };
+        
+          var marker = new google.maps.Marker({
+            position: {lat: latit, lng: longit},
+            map: map,
+            icon: image
+            /*title: beach[0],
+            zIndex: beach[3]
+          });
+        }
+      }*/
+      
+    /*  $(document).ready(function(){
+          $("button").click(function(){
+        $.get("http://api.openweathermap.org/data/2.5/group?id=3173435,6541999,6541470,6541858,3172394,6541998,3165186,3169071,3176219,3183089,6542000,3165525,1276948,6540125,2523920,3176959,3165243,3171180,3182997,3164603&units=metric&APPID=ea89f272bb81b851368ba4f8d9f03c06", 
+        function(data) {
+             $.each(data, function(i) {
+              var longit= data.list[i].coord.lon;
+              var latit= data.list[i].coord.lat;
+              var ico= data.list[i].weather[0].icon;
+              console.log(longit);
+          
+        
+        
+        var image = 'http://openweathermap.org/img/w/'+ico+'.png';
+    
+        var beachMarker = new google.maps.Marker({
+          position: {lat: latit, lng: longit},
+          map: map,
+          icon: image
+      });
+        });
+        });
+        
+    });
+});
+      
+      
+        
+        /*   $.each(data, function(i) {
+              var longit= data.list[i].coord.lon;
+              var latit= data.list[i].coord.lat;
+              var ico= data.list[i].weather[0].icon;
+              setMarkers(map,longit,latit,ico);
+          });
+        });
+    });*/
+      
+      
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBwtduHJmb5yAYjiVwk9uBBwSYBd1w83Yc&callback=initMap">
+    </script>
+  </body>
+</html>
